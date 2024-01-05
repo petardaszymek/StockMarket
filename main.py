@@ -11,12 +11,12 @@ class StockMarket:
 
         if not existing_order_index.empty:
             self.orders_df = self.orders_df.drop(existing_order_index).reset_index(drop=True)
-        new_order = pd.Series({"Id": order_id,
-                               "Order": order_action,
-                               "Type": order_type,
-                               "Price": order_price,
-                               "Quantity": order_quantity})
-        updated_df = pd.concat([self.orders_df, new_order.to_frame().transpose()], ignore_index=True)
+        new_order = pd.DataFrame({"Id": [order_id],
+                                  "Order": [order_action],
+                                  "Type": [order_type],
+                                  "Price": [order_price],
+                                  "Quantity": [order_quantity]})
+        updated_df = pd.concat([self.orders_df, new_order], ignore_index=True)
 
         self.orders_df = updated_df
 
