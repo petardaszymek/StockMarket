@@ -1,0 +1,13 @@
+On every stock exchange trading is realized by making buy and sell orders with given price and quantity.
+For example, buying 100 apple shares with price 55.0, those orders can be: added and/or removed.
+Having following orders:
+1) Create an object that stores them.
+2) Write a piece of code that in every step displays the sum of buy/sell orders with best price.
+
+Id  Order  Type  Price  Quantity
+1   Buy    Add   20.0   100
+2   Sell   Add   25.0   200
+3   Buy    Add   23.0   50
+4   Buy    Add   23.0   70
+3   Buy   Remove 23.0   50
+5   Sell   Add   28     100
