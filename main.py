@@ -10,29 +10,31 @@ class StockMarket:
         existing_order_index = self.orders_df[(self.orders_df["Id"] == order_id)].index
 
         if not existing_order_index.empty:
-            self.orders_df = self.orders_df.drop(existing_order_index).reset_index(drop=True)
-        new_order = pd.DataFrame({"Id": [order_id],
-                                  "Order": [order_action],
-                                  "Type": [order_type],
-                                  "Price": [order_price],
-                                  "Quantity": [order_quantity]})
-        updated_df = pd.concat([self.orders_df, new_order], ignore_index=True)
+            existing_order = self.orders_df.loc[existing_order_index].iloc[0]
 
-        self.orders_df = updated_df
-
-        if order_type.lower() == "remove":
-            self.remove_order(order_id)
-
-    def remove_order(self, order_id):
-        remove_index = self.orders_df[(self.orders_df["Id"] == order_id) & (self.orders_df["Type"] == "Remove")].index
-
-        if not remove_index.empty:
-            removed_order = self.orders_df.loc[remove_index].iloc[0]
-            print(f"Order successfully deleted: \n{removed_order}")
-
-            self.orders_df = self.orders_df.drop(remove_index).reset_index(drop=True)
+            if existing_order["Price"] != order_price:
+                new_order_id = self.orders_df["Id"].max() + 1
+                new_order = pd.DataFrame({"Id": [new_order_id],
+                                          "Order": [order_action],
+                                          "Type": [order_type],
+                                          "Price": [order_price],
+                                          "Quantity": [order_quantity]})
+                self.orders_df = pd.concat([self.orders_df, new_order], ignore_index=True)
+            elif order_type == "Remove" and existing_order["Quantity"] == order_quantity:
+                self.orders_df = self.orders_df.drop(existing_order_index).reset_index(drop=True)
+                print(f"Order removed: {order_id}")
+            elif order_type == "Remove" and existing_order["Quantity"] > order_quantity:
+                self.orders_df.loc[existing_order_index, "Quantity"] -= order_quantity
+                print(f"Order partially removed: {order_id}")
         else:
-            print(f"There is no order: {order_id} with Type: 'Remove'.")
+            new_order = pd.DataFrame({"Id": [order_id],
+                                      "Order": [order_action],
+                                      "Type": [order_type],
+                                      "Price": [order_price],
+                                      "Quantity": [order_quantity]})
+            updated_df = pd.concat([self.orders_df, new_order], ignore_index=True)
+
+            self.orders_df = updated_df
 
     def display_summary(self):
         buy_orders = self.orders_df[(self.orders_df["Order"] == "Buy") & (self.orders_df["Type"] != "Remove")]
